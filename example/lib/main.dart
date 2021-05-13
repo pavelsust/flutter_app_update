@@ -20,6 +20,7 @@ class _MyAppState extends State<MyApp> {
   void initState() {
     super.initState();
     initPlatformState();
+    isUpdateAvailable();
   }
 
   // Platform messages are asynchronous, so we initialize in an async method.
@@ -41,6 +42,20 @@ class _MyAppState extends State<MyApp> {
       _platformVersion = platformVersion;
     });
   }
+
+
+  // Platform messages are asynchronous, so we initialize in an async method.
+  Future<void> isUpdateAvailable() async {
+    bool appUpdate;
+    // Platform messages may fail, so we use a try/catch PlatformException.
+    try {
+      appUpdate = await FlutterAppUpdate.isAppUpdate;
+    } on PlatformException {
+      appUpdate = false;
+    }
+    print("app update $appUpdate");
+  }
+
 
   @override
   Widget build(BuildContext context) {

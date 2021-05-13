@@ -377,14 +377,9 @@ public interface IAppUpdater {
      * Execute AppUpdater in background.
      *
      * @return this
-     * @deprecated use {@link #start()} instead
      */
     AppUpdater init();
-
-    /**
-     * Execute AppUpdater in background.
-     */
-    void start();
+    
 
     /**
      * Stops the execution of AppUpdater.

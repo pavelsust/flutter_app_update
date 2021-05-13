@@ -19,6 +19,8 @@ import com.rockerzs.appupdater.interfaces.IAppUpdater;
 import com.rockerzs.appupdater.objects.GitHub;
 import com.rockerzs.appupdater.objects.Update;
 
+import io.flutter.plugin.common.MethodChannel;
+
 //import com.github.javiersantos.appupdater.enums.AppUpdaterError;
 //import com.github.javiersantos.appupdater.enums.Display;
 //import com.github.javiersantos.appupdater.enums.Duration;
@@ -47,7 +49,6 @@ public class AppUpdater implements IAppUpdater {
     private String titleUpdate, descriptionUpdate, btnDismiss, btnUpdate, btnDisable; // Update available
     private String titleNoUpdate, descriptionNoUpdate; // Update not available
     
-    
     private int iconResId;
     private UtilsAsync.LatestAppVersion latestAppVersion;
     private DialogInterface.OnClickListener btnUpdateClickListener, btnDismissClickListener, btnDisableClickListener;
@@ -65,6 +66,7 @@ public class AppUpdater implements IAppUpdater {
         this.showEvery = 1;
         this.showAppUpdated = false;
         this.isDialogCancelable = true;
+
     }
 
     @Override
@@ -330,62 +332,24 @@ public class AppUpdater implements IAppUpdater {
 
     @Override
     public AppUpdater init() {
-        start();
         return this;
     }
-
-    @Override
-    public void start() {
+    
+    
+    public void start(final MethodChannel.Result result) {
         latestAppVersion = new UtilsAsync.LatestAppVersion(context, false, updateFrom, gitHub, xmlOrJsonUrl, new LibraryListener() {
             @Override
             public void onSuccess(Update update) {
                 if (context instanceof Activity && ((Activity) context).isFinishing()) {
+                    result.success(null);
                     return;
                 }
 
                 Update installedUpdate = new Update(UtilsLibrary.getAppInstalledVersion(context), UtilsLibrary.getAppInstalledVersionCode(context));
                 
                 Log.d("SHOW_UPDATE" , ""+UtilsLibrary.isUpdateAvailable(installedUpdate , update));
+                result.success(UtilsLibrary.isUpdateAvailable(installedUpdate , update));
                 
-                
-//                if (UtilsLibrary.isUpdateAvailable(installedUpdate, update)) {
-//                    Integer successfulChecks = libraryPreferences.getSuccessfulChecks();
-//                    if (UtilsLibrary.isAbleToShow(successfulChecks, showEvery)) {
-//                        switch (display) {
-//                            case DIALOG:
-//                                final DialogInterface.OnClickListener updateClickListener = btnUpdateClickListener == null ? new UpdateClickListener(context, updateFrom, update.getUrlToDownload()) : btnUpdateClickListener;
-//                                final DialogInterface.OnClickListener disableClickListener = btnDisableClickListener == null ? new DisableClickListener(context) : btnDisableClickListener;
-//
-//                                alertDialog = UtilsDisplay.showUpdateAvailableDialog(context, titleUpdate, getDescriptionUpdate(context, update, Display.DIALOG), btnDismiss, btnUpdate, btnDisable, updateClickListener, btnDismissClickListener, disableClickListener);
-//                                alertDialog.setCancelable(isDialogCancelable);
-//                                alertDialog.show();
-//                                break;
-//                            case SNACKBAR:
-//                                snackbar = UtilsDisplay.showUpdateAvailableSnackbar(context, getDescriptionUpdate(context, update, Display.SNACKBAR), UtilsLibrary.getDurationEnumToBoolean(duration), updateFrom, update.getUrlToDownload());
-//                                snackbar.show();
-//                                break;
-//                            case NOTIFICATION:
-//                                UtilsDisplay.showUpdateAvailableNotification(context, titleUpdate, getDescriptionUpdate(context, update, Display.NOTIFICATION), updateFrom, update.getUrlToDownload(), iconResId);
-//                                break;
-//                        }
-//                    }
-//                    libraryPreferences.setSuccessfulChecks(successfulChecks + 1);
-//                } else if (showAppUpdated) {
-//                    switch (display) {
-//                        case DIALOG:
-//                            alertDialog = UtilsDisplay.showUpdateNotAvailableDialog(context, titleNoUpdate, getDescriptionNoUpdate(context));
-//                            alertDialog.setCancelable(isDialogCancelable);
-//                            alertDialog.show();
-//                            break;
-//                        case SNACKBAR:
-//                            snackbar = UtilsDisplay.showUpdateNotAvailableSnackbar(context, getDescriptionNoUpdate(context), UtilsLibrary.getDurationEnumToBoolean(duration));
-//                            snackbar.show();
-//                            break;
-//                        case NOTIFICATION:
-//                            UtilsDisplay.showUpdateNotAvailableNotification(context, titleNoUpdate, getDescriptionNoUpdate(context), iconResId);
-//                            break;
-//                    }
-//                }
             }
 
             @Override
@@ -399,10 +363,11 @@ public class AppUpdater implements IAppUpdater {
                 } else if (error == AppUpdaterError.JSON_URL_MALFORMED) {
                     throw new IllegalArgumentException("JSON file is not valid!");
                 }
+                result.success(false);
             }
         });
-
         latestAppVersion.execute();
+        
     }
 
     @Override
