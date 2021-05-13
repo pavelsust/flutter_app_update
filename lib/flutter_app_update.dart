@@ -11,10 +11,15 @@ class FlutterAppUpdate {
     return version;
   }
 
-  static Future<bool> get isAppUpdate async {
-    var version = await _channel.invokeMethod('checkUpdate');
-    print("version check $version");
-    return version;
-  }
+  // static Future<bool> get isAppUpdate async {
+  //   var version = await _channel.invokeMethod('checkUpdate');
+  //   print("version check $version");
+  //   return version;
+  // }
+
+static Future<Map<String, dynamic>> get isAppUpdate async {
+  final Map<String, dynamic> response = await _channel.invokeMapMethod<String, dynamic>('checkUpdate');
+  return response;
+}
 
 }

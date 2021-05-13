@@ -46,14 +46,12 @@ class _MyAppState extends State<MyApp> {
 
   // Platform messages are asynchronous, so we initialize in an async method.
   Future<void> isUpdateAvailable() async {
-    bool appUpdate;
-    // Platform messages may fail, so we use a try/catch PlatformException.
-    try {
-      appUpdate = await FlutterAppUpdate.isAppUpdate;
-    } on PlatformException {
-      appUpdate = false;
-    }
-    print("app update $appUpdate");
+    await FlutterAppUpdate.isAppUpdate.then((value){
+      print("app update ${value["update"] as bool}");
+      print("app version ${value["version"] as String}");
+    }).catchError((error){
+      print("update error is ${error.toString()}");
+    });
   }
 
 

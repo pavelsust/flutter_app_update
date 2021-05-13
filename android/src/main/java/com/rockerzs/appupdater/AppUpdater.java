@@ -19,6 +19,9 @@ import com.rockerzs.appupdater.interfaces.IAppUpdater;
 import com.rockerzs.appupdater.objects.GitHub;
 import com.rockerzs.appupdater.objects.Update;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import io.flutter.plugin.common.MethodChannel;
 
 //import com.github.javiersantos.appupdater.enums.AppUpdaterError;
@@ -348,7 +351,11 @@ public class AppUpdater implements IAppUpdater {
                 Update installedUpdate = new Update(UtilsLibrary.getAppInstalledVersion(context), UtilsLibrary.getAppInstalledVersionCode(context));
                 
                 Log.d("SHOW_UPDATE" , ""+UtilsLibrary.isUpdateAvailable(installedUpdate , update));
-                result.success(UtilsLibrary.isUpdateAvailable(installedUpdate , update));
+               
+                Map<String , Object> event = new HashMap<>();
+                event.put("update" , UtilsLibrary.isUpdateAvailable(installedUpdate , update));
+                event.put("version" , ""+update.getLatestVersion());
+                result.success(event);
                 
             }
 
