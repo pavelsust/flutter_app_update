@@ -18,8 +18,8 @@ class FlutterAppUpdate {
   // }
 
 static Future<Map<String, dynamic>> get isAppUpdate async {
-  final Map<String, dynamic> response = await _channel.invokeMapMethod<String, dynamic>('checkUpdate');
-  return response;
+  final Map<String, dynamic>? response = await _channel.invokeMapMethod<String, dynamic>('checkUpdate');
+  return response!;
 }
 
 }
